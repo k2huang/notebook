@@ -1,0 +1,162 @@
+# Git global setup
+git config --global user.name ""
+git config --global user.email ""
+
+
+# 生成ssh key
+ssh-keygen -t rsa -C "email"
+
+
+# 删除远程分支
+git push origin :deleted_branch
+git push origin -d deleted_branch
+
+
+# 打tag
+git tag  -a tag_name [-m tag_annotation] [commit id]
+git push origin tag_name / git push origin --tags master
+git show tag_name
+git tag
+
+
+# 查看改动
+git log -p
+git log --stat
+git show filename commitId
+git diff
+git diff --staged (or --cached)
+git diff HEAD
+
+
+# 用git rebase来merge代码
+git rebase target分支 or Commit
+
+# 用git rebase来merge代码时跳过其中一些commits
+# target分支为merge的target，如develop
+# source分支为merge的source, 如feature分支
+git rebase --onto target分支orCommit source分支保留的branch的起点commit(exclusive)   source分支保留的branch的终点commit(inclusive)
+
+
+# revert某一个历史commit(会产生一个新的commit)
+git revert commit
+
+
+# 回退历史版本
+git reset 重置HEAD&branch，工作目录内容保留，暂存区和回退产生的改动内容全部放回工作目录
+git reset --soft 重置HEAD&branch，所有工作目录和暂存区内容保留，回退产生的改动内容放到暂存区
+git reset --hard 重置HEAD&branch，且所有工作目录和暂存区内容都被擦除
+
+
+# 保存工作目录内容(不需要commit)，然后快速切换分支
+git stash -u [u代表 --include-untracked files]
+git checkout master
+git checkout feature
+git stash pop
+
+
+# 查看branch or commit引用移动情况
+git reflog
+
+
+# cherry-pick
+git cherry-pick commit
+Git cherry-pick commit1..commit100 (not include commit1)
+
+
+# Existing folder or Git repository
+cd existing_folder
+git init
+git remote add origin xxx.git
+git add .
+git commit
+git push -u origin master
+
+
+工作区擦除
+git checkout -- file
+
+暂存区回退到工作区
+git reset HEAD <file>
+
+commit之后，工作区和暂存区都被擦除
+git reset --hard commit_id
+
+
+# 删除 untracked files
+git clean -f 
+
+# 连 untracked 的目录也一起删掉
+git clean -fd
+
+# 连 gitignore 的untrack 文件/目录也一起删掉 （慎用，一般这个是用来删掉编译出来的 .o之类的文件用的）
+git clean -xfd
+
+# 在用上述 git clean 前，墙裂建议加上 -n 参数来先看看会删掉哪些文件，防止重要文件被误删
+git clean -nxfd
+git clean -nf
+git clean -nfd
+
+
+# 删除历史commits中一个
+方法1
+git rebase --i commit^
+删除pick开头的行记录
+
+方法2
+git rebase --onto commit^ commit branch_name
+
+
+
+修正历史
+
+# 修改最后一次commit
+修改文件
+git add 文件
+git commit --amend
+
+# 修改某一次的commit
+git rebase -i commit^
+pick -> edit 对应的commit
+修改文件
+git add 文件
+git commit --amend
+git rebase --continue
+
+
+
+fork repo
+
+1. git clone xxx-fork.git
+2. git remote add upstream xxx.git
+3. git fetch upstream
+4. git merge upstream/master
+ 冲突解决后：
+    * add到暂存区，
+    * commit到本地分支，
+    * 就可以合并了，再次执行git merge upstream/master
+
+5. git push origin master
+
+step3,4可以合并为一个命令: git pull upstream master
+
+
+同步上游一个已经存在的新分支
+1. git fetch upstream
+2. git checkout 新分支
+
+
+
+冲突解决
+
+# git rebase
+git fetch
+git rebase origin/develop
+解决冲突
+git add .
+git rebase --continue
+
+# git merge
+git merge
+解决冲突
+git add
+git commit
